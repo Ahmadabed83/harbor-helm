@@ -8,31 +8,11 @@ metadata:
 data:
   PORT: "9999"
   CACHE: "redis"
-  CACHE_REDIS_ADDR: "{{ template "harbor.redis.host" . }}:{{ template "harbor.redis.port" . }}"
-  CACHE_REDIS_DB: "{{ template "harbor.redis.chartmuseumDatabaseIndex" . }}"
+  CACHE_REDIS_ADDR: "{{ template "harbor.redis.host" }}:{{ template "harbor.redis.port" }}"
+  CACHE_REDIS_DB: "{{ template "harbor.redis.databaseIndex" }}"
   BASIC_AUTH_USER: "chart_controller"
   DEPTH: "1"
-{{- if eq .Values.logLevel "debug" }}
-  DEBUG: "true"
-{{- else }}
-  DEBUG: "false"
-{{- end }}
-  LOG_JSON: "true"
-  DISABLE_METRICS: "false"
-  DISABLE_API: "false"
-  DISABLE_STATEFILES: "false"
-  ALLOW_OVERWRITE: "true"
-  CHART_URL:
-  AUTH_ANONYMOUS_GET: "false"
-  TLS_CERT:
-  TLS_KEY:
-  CONTEXT_PATH:
-  INDEX_LIMIT: "0"
-  MAX_STORAGE_OBJECTS: "0"
-  MAX_UPLOAD_SIZE: "20971520"
-  CHART_POST_FORM_FIELD_NAME: "chart"
-  PROV_POST_FORM_FIELD_NAME: "prov"
-{{- $storage := .Values.storage }}
+{{- $storage := .Values.registry.storage }}
 {{- $storageType := $storage.type }}
 {{- if eq $storageType "filesystem" }}
   STORAGE: "local"
@@ -95,4 +75,20 @@ data:
   {{- end }}
   ALIBABA_CLOUD_ACCESS_KEY_ID: {{ $storage.oss.accesskeyid }}
 {{- end }}
+  DEBUG: "false"
+  LOG_JSON: "true"
+  DISABLE_METRICS: "false"
+  DISABLE_API: "false"
+  DISABLE_STATEFILES: "false"
+  ALLOW_OVERWRITE: "true"
+  CHART_URL:
+  AUTH_ANONYMOUS_GET: "false"
+  TLS_CERT:
+  TLS_KEY:
+  CONTEXT_PATH:
+  INDEX_LIMIT: "0"
+  MAX_STORAGE_OBJECTS: "0"
+  MAX_UPLOAD_SIZE: "20971520"
+  CHART_POST_FORM_FIELD_NAME: "chart"
+  PROV_POST_FORM_FIELD_NAME: "prov"
 {{- end }}
