@@ -1,5 +1,5 @@
 {{- if .Values.chartmuseum.enabled }}
-apiVersion: apps/v1
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: "{{ template "harbor.fullname" . }}-chartmuseum"
@@ -7,7 +7,7 @@ metadata:
 {{ include "harbor.labels" . | indent 4 }}
     component: chartmuseum
 spec:
-  replicas: {{ .Values.chartmuseum.replicas }}
+  replicas: 1
   selector:
     matchLabels:
 {{ include "harbor.matchLabels" . | indent 6 }}
@@ -21,7 +21,7 @@ spec:
       containers:
       - name: chartmuseum
         image: {{ .Values.chartmuseum.image.repository }}:{{ .Values.chartmuseum.image.tag }}
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        imagePullPolicy: {{ .Values.chartmuseum.image.pullPolicy }}
         resources:
 {{ toYaml .Values.chartmuseum.resources | indent 10 }}
         envFrom:
@@ -33,17 +33,17 @@ spec:
           - name: BASIC_AUTH_PASS
             valueFrom:
               secretKeyRef:
-                name: {{ template "harbor.core" . }}
+                name: "{{ template "harbor.fullname" . }}-ui"
                 key: secret
         ports:
         - containerPort: 9999
+        # TODO: update it after moving the storage out of registry scope
         volumeMounts:
         - name: chartmuseum-data
           mountPath: /chart_storage
-          subPath: {{ .Values.chartmuseum.volumes.data.subPath }}
       volumes:
       - name: chartmuseum-data
-      {{- if and .Values.persistence.enabled (eq .Values.storage.type "filesystem") }}
+      {{- if and .Values.persistence.enabled (eq .Values.registry.storage.type "filesystem") }}
         persistentVolumeClaim:
           claimName: {{ .Values.chartmuseum.volumes.data.existingClaim | default (printf "%s-chartmuseum" (include "harbor.fullname" .)) }}
       {{- else }}
